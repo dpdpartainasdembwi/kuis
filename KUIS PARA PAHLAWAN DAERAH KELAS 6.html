@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Interaktif IPAS Kelas VI - Para Pahlawan Daerahku</title>
+    <style>
+        :root {
+            --primary-color: #1e3c72;
+            --secondary-color: #2a5298;
+            --accent-color: #ff9800;
+            --accent-hover: #e68a00;
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --correct-color: #2ecc71;
+            --correct-bg: #e8f8f5;
+            --wrong-color: #e74c3c;
+            --wrong-bg: #fde8e8;
+            --border-radius: 14px;
+            --shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            color: var(--text-color);
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            border-radius: var(--border-radius);
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 680px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header-identity {
+            text-align: center;
+            border-bottom: 2px dashed #e2e8f0;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+        }
+
+        .school-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 4px;
+        }
+
+        .sub-title {
+            font-size: 0.95rem;
+            color: #64748b;
+            margin-bottom: 2px;
+        }
+
+        .quiz-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--secondary-color);
+            margin-top: 8px;
+        }
+
+        /* Halaman Awal */
+        .screen {
+            display: none;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        .start-card {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .info-box {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 16px 0;
+            text-align: left;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .info-box ul {
+            padding-left: 20px;
+        }
+
+        .timer-option {
+            margin: 16px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+
+        .btn {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(255, 152, 0, 0.4);
+            width: 100%;
+            max-width: 280px;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background-color: #cbd5e1;
+            box-shadow: none;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Quiz Header */
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 10px;
+            background-color: #e2e8f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: var(--secondary-color);
+            transition: width 0.3s ease;
+        }
+
+        .timer-badge {
+            background: #fff3e0;
+            color: #e65100;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #ffe0b2;
+            font-weight: 700;
+        }
+
+        .question-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option-btn {
+            background: #ffffff;
+            border: 2px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 14px 18px;
+            font-size: 1rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #334155;
+            font-weight: 500;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            border-color: var(--secondary-color);
+            background-color: #f0f7ff;
+        }
+
+        .option-btn.correct {
+            background-color: var(--correct-bg) !important;
+            border-color: var(--correct-color) !important;
+            color: #15803d !important;
+            font-weight: 700;
+        }
+
+        .option-btn.wrong {
+            background-color: var(--wrong-bg) !important;
+            border-color: var(--wrong-color) !important;
+            color: #b91c1c !important;
+            font-weight: 700;
+        }
+
+        .option-prefix {
+            font-weight: 700;
+            min-width: 24px;
+        }
+
+        .feedback-box {
+            margin-top: 18px;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: none;
+            line-height: 1.5;
+        }
+
+        .feedback-box.correct {
+            display: block;
+            background-color: var(--correct-bg);
+            border: 1px solid var(--correct-color);
+            color: #166534;
+        }
+
+        .feedback-box.wrong {
+            display: block;
+            background-color: var(--wrong-bg);
+            border: 1px solid var(--wrong-color);
+            color: #991b1b;
+        }
+
+        .next-btn-container {
+            margin-top: 20px;
+            text-align: right;
+        }
+
+        .btn-next {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        .btn-next:hover {
+            background-color: var(--secondary-color);
+        }
+
+        /* Halaman Hasil */
+        .result-card {
+            text-align: center;
+            padding: 10px 0;
+        }
+
+        .score-circle {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            margin: 20px auto;
+            box-shadow: 0 6px 16px rgba(30, 60, 114, 0.3);
+        }
+
+        .score-number {
+            font-size: 2.8rem;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.9;
+        }
+
+        .result-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 10px;
+            flex: 1;
+            max-width: 140px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .stat-value.correct-val { color: var(--correct-color); }
+        .stat-value.wrong-val { color: var(--wrong-color); }
+
+        .stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 46px;
+            height: 24px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 24px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--accent-color);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+            .question-text {
+                font-size: 1.05rem;
+            }
+            .option-btn {
+                padding: 12px 14px;
+                font-size: 0.95rem;
+            }
+            .school-title { font-size: 1.1rem; }
+            .quiz-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- Header Identitas -->
+        <div class="header-identity">
+            <div class="school-title">SD NEGERI JEMBER KIDUL 02</div>
+            <div class="sub-title">Mata Pelajaran: IPAS | Kelas VI (Enam)</div>
+            <div class="sub-title">Guru: Dewi Fauziyah Ramadhanti, S.Pd</div>
+            <div class="quiz-title">BAB 3. Jejak Sang Pahlawan<br><small style="font-size:0.9rem; font-weight:normal; color:#475569;">Topik B: Para Pahlawan Daerahku</small></div>
+        </div>
+
+        <!-- 1. HALAMAN AWAL -->
+        <div id="start-screen" class="screen active">
+            <div class="start-card">
+                <p style="font-size: 1rem; color: #475569; margin-bottom: 12px;">Selamat datang di Kuis Interaktif IPAS!</p>
+                
+                <div class="info-box">
+                    <strong>Petunjuk Kuis:</strong>
+                    <ul>
+                        <li>Jumlah Soal: <strong>20 Butir Pilihan Ganda</strong></li>
+                        <li>Tingkat Kesulitan: <strong>Sedang</strong></li>
+                        <li>Pilihlah salah satu jawaban (A, B, C, atau D) yang paling tepat.</li>
+                        <li>Umpan balik langsung akan muncul setelah Anda memilih jawaban.</li>
+                    </ul>
+                </div>
+
+                <div class="timer-option">
+                    <span>Aktifkan Timer (30 Detik/Soal):</span>
+                    <label class="switch">
+                        <input type="checkbox" id="timer-toggle" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button class="btn" onclick="startQuiz()">MULAI KUIS</button>
+            </div>
+        </div>
+
+        <!-- 2. HALAMAN SOAL -->
+        <div id="quiz-screen" class="screen">
+            <div class="quiz-header">
+                <span id="question-indicator">Soal 1 dari 20</span>
+                <span id="timer-badge" class="timer-badge">Waktu: <span id="time-left">30</span>s</span>
+            </div>
+
+            <div class="progress-bar-container">
+                <div id="progress-bar" class="progress-bar"></div>
+            </div>
+
+            <div id="question-text" class="question-text">Teks Pertanyaan...</div>
+
+            <div id="options-container" class="options-container">
+                <!-- Tombol pilihan jawaban akan diisi oleh JS -->
+            </div>
+
+            <div id="feedback-box" class="feedback-box">
+                <!-- Umpan balik langsung akan muncul di sini -->
+            </div>
+
+            <div class="next-btn-container">
+                <button id="btn-next" class="btn-next" onclick="nextQuestion()">Soal Berikutnya &rarr;</button>
+            </div>
+        </div>
+
+        <!-- 3. HALAMAN HASIL -->
+        <div id="result-screen" class="screen">
+            <div class="result-card">
+                <h2>Hasil Kuis Anda</h2>
+                <p id="result-message" style="color: #64748b; margin-top: 6px;">Kerja yang bagus!</p>
+
+                <div class="score-circle">
+                    <span id="final-score" class="score-number">0</span>
+                    <span class="score-label">SKOR AKHIR</span>
+                </div>
+
+                <div class="result-stats">
+                    <div class="stat-item">
+                        <div id="correct-count" class="stat-value correct-val">0</div>
+                        <div class="stat-label">Benar</div>
+                    </div>
+                    <div class="stat-item">
+                        <div id="wrong-count" class="stat-value wrong-val">0</div>
+                        <div class="stat-label">Salah</div>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="resetQuiz()">ULANGI KUIS</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Bank Soal 20 Butir Berdasarkan Bahan Ajar IPAS Kelas VI Topik B
+        const questions = [
+            {
+                question: "Tokoh pejuang dari Bonjol, Sumatera Barat yang memimpin Perang Padri melawan penjajahan Belanda adalah...",
+                options: ["Pangeran Diponegoro", "Tuanku Imam Bonjol", "Teuku Umar", "Sultan Hasanuddin"],
+                correct: 1,
+                explanation: "Tuanku Imam Bonjol berasal dari Bonjol, Pasaman, Sumatera Barat dan memimpin Perang Padri melawan Belanda."
+            },
+            {
+                question: "Srikandi gagah berani dari Aceh yang tetap melanjutkan perjuangan rakyat Aceh melawan Belanda meskipun suaminya gugur adalah...",
+                options: ["R.A. Kartini", "Dewi Sartika", "H.R. Rasuna Said", "Cut Nyak Dien"],
+                correct: 3,
+                explanation: "Cut Nyak Dien memimpin perlawanan rakyat Aceh terhadap Belanda setelah suaminya, Teuku Umar, gugur."
+            },
+            {
+                question: "Letkol Mochammad Sroedji merupakan pejuang yang sangat erat hubungannya dengan daerah Jember. Beliau memimpin pasukan gerilya dalam pertempuran di...",
+                options: ["Benteng Duurstede", "Desa Karang Kedawung", "Pergurusn Taman Siswa", "Pertempuran Puputan Margarana"],
+                correct: 1,
+                explanation: "Letkol Mochammad Sroedji memimpin Brigade III Damarwulan dan gugur saat perang gerilya di Desa Karang Kedawung, Jember pada 8 Februari 1949."
+            },
+            {
+                question: "Dokter militer yang gugur saat berusaha menolong Letkol Mochammad Sroedji dalam pertempuran di Jember adalah...",
+                options: ["Dr. Soetomo", "Johannes Leimena", "Letkol dr. R.M. Soebandi", "K.H. Hasyim Asy'ari"],
+                correct: 2,
+                explanation: "Letkol dr. R.M. Soebandi berjuang sebagai dokter militer dan gugur bersama Mochammad Sroedji di Karang Kedawung, Jember."
+            },
+            {
+                question: "Sultan Hasanuddin mendapat julukan 'Ayam Jantan dari Timur' karena keberaniannya memimpin Kesultanan Gowa melawan VOC di daerah...",
+                options: ["Sulawesi Selatan", "Maluku", "Kalimantan Selatan", "Bali"],
+                correct: 0,
+                explanation: "Sultan Hasanuddin berasal dari Gowa, Sulawesi Selatan yang tegas dan gigih melawan monopolik VOC."
+            },
+            {
+                question: "Pahlawan daerah dari Yogyakarta yang mendirikan Perguruan Taman Siswa pada tahun 1922 untuk memperjuangkan hak pendidikan rakyat pribumi adalah...",
+                options: ["Ir. H. Djuanda", "Ki Hajar Dewantara", "Abdoel Moeis", "Sam Ratulangi"],
+                correct: 1,
+                explanation: "Ki Hajar Dewantara mendirikan Perguruan Taman Siswa di Yogyakarta agar rakyat pribumi memperoleh pendidikan layak."
+            },
+            {
+                question: "Tokoh pahlawan asal Jember yang memimpin Laskar Rakyat Jember Utara dan berjuang bergerilya dengan senjata tradisional adalah...",
+                options: ["Bura", "Bung Tomo", "Pattimura", "Pangeran Antasari"],
+                correct: 0,
+                explanation: "Bura berasal dari Desa Jatian, Pakusari, Jember. Beliau memimpin Laskar Rakyat Jember Utara dan menolak keras bekerja sama dengan Belanda."
+            },
+            {
+                question: "Perjuangan memulihkan dan memperjuangkan hak pendidikan bagi kaum perempuan di Jepara, Jawa Tengah dipelopori oleh...",
+                options: ["Dewi Sartika", "H.R. Rasuna Said", "R.A. Kartini", "Cut Nyak Dien"],
+                correct: 2,
+                explanation: "R.A. Kartini dari Jepara memperjuangkan kesetaraan dan pendidikan bagi perempuan melalui karya surat-suratnya."
+            },
+            {
+                question: "Pahlawan dari Surabaya yang terkenal membangkitkan semangat tempur rakyat melalui siaran radio dalam Pertempuran 10 November 1945 adalah...",
+                options: ["Bung Tomo", "Jenderal Sudirman", "Dr. Soetomo", "K.H. Achmad Siddiq"],
+                correct: 0,
+                explanation: "Bung Tomo (Sutomo) membangkitkan semangat rakyat Surabaya melawan pasukan Sekutu lewat pidato dan siaran radio."
+            },
+            {
+                question: "K.H. Achmad Siddiq merupakan tokoh ulama dan pejuang asal Jember yang memiliki peran besar dalam...",
+                options: ["Mendirikan Sakola Istri di Bandung", "Mengusulkan Deklarasi Djuanda", "Memperjuangkan penerimaan Pancasila dan persatuan melalui NU", "Memimpin Pertempuran Puputan Margarana"],
+                correct: 2,
+                explanation: "K.H. Achmad Siddiq dari Jember berperan besar memperjuangkan penerimaan Pancasila sebagai dasar negara dan persatuan bangsa."
+            },
+            {
+                question: "I Gusti Ngurah Rai memimpin pertempuran titik darah penghabisan untuk mempertahankan kemerdekaan di Bali yang dikenal dengan sebutan...",
+                options: ["Perang Padri", "Perang Banjar", "Pertempuran Puputan Margarana", "Perang Jawa"],
+                correct: 2,
+                explanation: "I Gusti Ngurah Rai memimpin pasukan Ciung Wanara dalam Pertempuran Puputan Margarana di Bali pada 20 November 1946."
+            },
+            {
+                question: "Organisasi Budi Utomo yang berdiri pada 20 Mei 1908 sebagai pelopor Kebangkitan Nasional didirikan oleh para pelajar STOVIA di bawah pimpinan...",
+                options: ["Dr. Soetomo", "Johannes Leimena", "Abdoel Moeis", "Sam Ratulangi"],
+                correct: 0,
+                explanation: "Dr. Soetomo bersama pelajar STOVIA mendirikan Budi Utomo untuk menggerakkan perjuangan lewat pendidikan dan organisasi."
+            },
+            {
+                question: "Apa perbedaan utama antara Pahlawan Daerah dan Pahlawan Nasional?",
+                options: [
+                    "Pahlawan daerah hanya berjuang dengan senjata tajam, pahlawan nasional tidak.",
+                    "Pahlawan daerah berfokus membela/memajukan daerah asalnya, sedangkan pahlawan nasional berdampak luas bagi seluruh bangsa.",
+                    "Pahlawan nasional hanya berasal dari Pulau Jawa.",
+                    "Pahlawan daerah tidak mendapat rasa hormat dari masyarakat."
+                ],
+                correct: 1,
+                explanation: "Pahlawan Daerah berfokus membela wilayah asalnya terlebih dahulu, sedangkan Pahlawan Nasional memberikan dampak bagi seluruh bangsa Indonesia."
+            },
+            {
+                question: "Tokoh dari Tasikmalaya yang memperjuangkan keutuhan wilayah laut Indonesia melalui Deklarasi 13 Desember 1957 adalah...",
+                options: ["Ir. H. Djuanda Kartawidjaja", "Sam Ratulangi", "H.R. Rasuna Said", "Tuanku Imam Bonjol"],
+                correct: 0,
+                explanation: "Ir. H. Djuanda memperjuangkan Deklarasi Djuanda yang menegaskan laut antarpulau sebagai bagian dari wilayah kedaulatan Indonesia."
+            },
+            {
+                question: "Memimpin perang gerilya gerak cepat di hutan dalam mempertahankan kemerdekaan meskipun sedang menderita sakit parah adalah bentuk perjuangan dari...",
+                options: ["Jenderal Sudirman", "Pangeran Antasari", "Teuku Umar", "Pattimura"],
+                correct: 0,
+                explanation: "Panglima Besar Jenderal Sudirman memimpin perang gerilya melawan Belanda dalam keadaan sakit parah demi mempertahankan kemerdekaan."
+            },
+            {
+                question: "Di bawah ini yang merupakan contoh penerapan nilai keteladanan 'Pantang Menyerah' bagi seorang siswa di sekolah adalah...",
+                options: ["Membantu teman piket kelas", "Mengikuti upacara bendera dengan tertib", "Tetap giat berusaha dan belajar saat menghadapi pelajaran yang sulit", "Mengajak teman melakukan kegiatan positif"],
+                correct: 2,
+                explanation: "Sikap pantang menyerah siswa dicerminkan dengan tidak mudah putus asa dan terus berusaha saat menemukan kesulitan belajar."
+            },
+            {
+                question: "Berikut ini yang BUKAN merupakan alasan penting mengapa kita perlu mempelajari pahlawan daerah adalah...",
+                options: [
+                    "Mengenal sejarah dan asal-usul kampung halaman",
+                    "Menumbuhkan rasa bangga terhadap daerah tempat tinggal",
+                    "Ajang untuk menyombongkan daerah sendiri di atas daerah lain",
+                    "Menjaga dan melestarikan warisan nilai perjuangan"
+                ],
+                correct: 2,
+                explanation: "Mempelajari pahlawan daerah bertujuan menumbuhkan kebanggaan, keteladanan, dan sejarah, bukan untuk menyombongkan diri atau merendahkan daerah lain."
+            },
+            {
+                question: "Salah satu dampak positif perjuangan para pahlawan terhadap bidang PENDIRIKAN masyarakat masa kini adalah...",
+                options: [
+                    "Masyarakat lebih bebas mengelola hasil bumi dan pertanian",
+                    "Semakin banyak sekolah dibangun sehingga generasi muda dapat belajar dan cerdas",
+                    "Budaya daerah digantikan dengan budaya luar",
+                    "Masyarakat hanya bekerja di sektor perdagangan"
+                ],
+                correct: 1,
+                explanation: "Dampak di bidang pendidikan adalah terbukanya kesempatan belajar yang luas dan bertambahnya sekolah-sekolah untuk mencerdaskan bangsa."
+            },
+            {
+                question: "Pendiri organisasi Nahdlatul Ulama (NU) yang mengeluarkan 'Resolusi Jihad' pada 22 Oktober 1945 untuk mempertahankan kemerdekaan Indonesia adalah...",
+                options: ["K.H. Hasyim Asy'ari", "K.H. Achmad Siddiq", "Tuanku Imam Bonjol", "Abdoel Moeis"],
+                correct: 0,
+                explanation: "K.H. Hasyim Asy'ari mendirikan NU pada tahun 1926 dan menyerukan Resolusi Jihad 1945."
+            },
+            {
+                question: "Pahlawan dari Maluku yang berhasil merebut Benteng Duurstede dari tangan Belanda pada perlawanan tahun 1817 adalah...",
+                options: ["Pattimura (Thomas Matulessy)", "Sultan Hasanuddin", "I Gusti Ngurah Rai", "Johannes Leimena"],
+                correct: 0,
+                explanation: "Pattimura memimpin perlawanan rakyat Maluku pada tahun 1817 dan berhasil merebut Benteng Duurstede."
+            }
+        ];
+
+        // State Aplikasi Kuis
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let correctAnswersCount = 0;
+        let wrongAnswersCount = 0;
+        let selectedOption = null;
+        let timerInterval = null;
+        let timeLeft = 30;
+        let isTimerActive = true;
+
+        // Elemen DOM
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionIndicator = document.getElementById('question-indicator');
+        const progressBar = document.getElementById('progress-bar');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const feedbackBox = document.getElementById('feedback-box');
+        const btnNext = document.getElementById('btn-next');
+        const timerBadge = document.getElementById('timer-badge');
+        const timeLeftSpan = document.getElementById('time-left');
+
+        function startQuiz() {
+            isTimerActive = document.getElementById('timer-toggle').checked;
+            currentQuestionIndex = 0;
+            score = 0;
+            correctAnswersCount = 0;
+            wrongAnswersCount = 0;
+
+            startScreen.classList.remove('active');
+            resultScreen.classList.remove('active');
+            quizScreen.classList.add('active');
+
+            if (!isTimerActive) {
+                timerBadge.style.display = 'none';
+            } else {
+                timerBadge.style.display = 'inline-block';
+            }
+
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            resetState();
+            const currentQ = questions[currentQuestionIndex];
+            
+            // Update Indikator & Progress Bar
+            questionIndicator.textContent = `Soal ${currentQuestionIndex + 1} dari ${questions.length}`;
+            const progressPercent = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+
+            // Display Teks Soal
+            questionText.textContent = `${currentQuestionIndex + 1}. ${currentQ.question}`;
+
+            // Display Opsi Jawaban
+            const prefixes = ["A", "B", "C", "D"];
+            currentQ.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.innerHTML = `<span class="option-prefix">${prefixes[index]}.</span> <span>${opt}</span>`;
+                btn.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Start Timer jika diaktifkan
+            if (isTimerActive) {
+                timeLeft = 30;
+                timeLeftSpan.textContent = timeLeft;
+                timerInterval = setInterval(() => {
+                    timeLeft--;
+                    timeLeftSpan.textContent = timeLeft;
+                    if (timeLeft <= 0) {
+                        clearInterval(timerInterval);
+                        autoTimeOut();
+                    }
+                }, 1000);
+            }
+        }
+
+        function resetState() {
+            if (timerInterval) clearInterval(timerInterval);
+            optionsContainer.innerHTML = '';
+            feedbackBox.className = 'feedback-box';
+            feedbackBox.style.display = 'none';
+            feedbackBox.textContent = '';
+            btnNext.style.display = 'none';
+            selectedOption = null;
+        }
+
+        function selectAnswer(index) {
+            if (selectedOption !== null) return; // Mencegah double click
+            selectedOption = index;
+
+            if (timerInterval) clearInterval(timerInterval);
+
+            const currentQ = questions[currentQuestionIndex];
+            const optionButtons = optionsContainer.children;
+
+            // Nonaktifkan semua tombol opsi
+            for (let btn of optionButtons) {
+                btn.disabled = true;
+            }
+
+            if (index === currentQ.correct) {
+                // Jawaban Benar
+                optionButtons[index].classList.add('correct');
+                score += 5; // Total 20 soal x 5 = 100
+                correctAnswersCount++;
+                feedbackBox.className = 'feedback-box correct';
+                feedbackBox.innerHTML = `<strong>Jawaban Tepat!</strong><br>${currentQ.explanation}`;
+            } else {
+                // Jawaban Salah
+                optionButtons[index].classList.add('wrong');
+                optionButtons[currentQ.correct].classList.add('correct');
+                wrongAnswersCount++;
+                feedbackBox.className = 'feedback-box wrong';
+                feedbackBox.innerHTML = `<strong>Jawaban Kurang Tepat!</strong><br>Jawaban benar: <strong>${["A","B","C","D"][currentQ.correct]}. ${currentQ.options[currentQ.correct]}</strong><br>${currentQ.explanation}`;
+            }
+
+            btnNext.style.display = 'inline-block';
+        }
+
+        function autoTimeOut() {
+            if (selectedOption !== null) return;
+            selectedOption = -1; // penanda waktu habis
+
+            const currentQ = questions[currentQuestionIndex];
+            const optionButtons = optionsContainer.children;
+
+            for (let btn of optionButtons) {
+                btn.disabled = true;
+            }
+
+            optionButtons[currentQ.correct].classList.add('correct');
+            wrongAnswersCount++;
+
+            feedbackBox.className = 'feedback-box wrong';
+            feedbackBox.innerHTML = `<strong>Waktu Habis!</strong><br>Jawaban yang benar: <strong>${["A","B","C","D"][currentQ.correct]}. ${currentQ.options[currentQ.correct]}</strong><br>${currentQ.explanation}`;
+
+            btnNext.style.display = 'inline-block';
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            quizScreen.classList.remove('active');
+            resultScreen.classList.add('active');
+
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('correct-count').textContent = correctAnswersCount;
+            document.getElementById('wrong-count').textContent = wrongAnswersCount;
+
+            const messageElem = document.getElementById('result-message');
+            if (score >= 80) {
+                messageElem.textContent = "Luar biasa! Kamu sangat memahami materi pahlawan daerah!";
+            } else if (score >= 60) {
+                messageElem.textContent = "Bagus! Kamu sudah memahami sebagian besar materi dengan baik.";
+            } else {
+                messageElem.textContent = "Jangan berkecil hati! Pelajari kembali bahan ajar dan coba lagi ya!";
+            }
+        }
+
+        function resetQuiz() {
+            resultScreen.classList.remove('active');
+            startScreen.classList.add('active');
+        }
+    </script>
+</body>
+</html>
